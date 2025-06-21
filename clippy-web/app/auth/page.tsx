@@ -1,14 +1,28 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
 export default function ClippyAIDashboard() {
-  const code = new URLSearchParams(window.location.search).get('code')
+  const [code, setCode] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const code = new URLSearchParams(window.location.search).get('code')
+      setCode(code)
+    }
+  }, [])
 
   const getAccessToken = async () => {
+    if (!code) {
+      console.warn('No code available yet.')
+      return
+    }
+
     try {
       const params = new URLSearchParams()
       params.append('client_key', 'sbawf7caqj8uuzazw8')
       params.append('client_secret', 'TV6Nt8GUQ6HDuV9c31c71OpYKmRSwdFs')
-      params.append('code', 'CODE') // Replace with real auth code
+      params.append('code', code)
       params.append('grant_type', 'authorization_code')
       params.append('redirect_uri', 'https://spur-hacks2025.vercel.app/auth')
 
@@ -25,25 +39,22 @@ export default function ClippyAIDashboard() {
       )
 
       const data = await response.json()
-      console.log('Result of code is', code)
-      console.log('Data of access token retrieval', data)
-      return data // return full object: includes access_token, refresh_token, open_id, etc.
+      console.log('✅ Access Token Response:', data)
+      return data
     } catch (err) {
-      console.error('Error fetching access token:', err)
+      console.error('❌ Error fetching access token:', err)
       return null
     }
   }
 
   const submitVideo = async () => {
     const tokenResponse = await getAccessToken()
-
     if (!tokenResponse || !tokenResponse.access_token) {
       console.error('No access token received.')
       return
     }
 
     const accessToken = tokenResponse.access_token
-    const FILE_UPLOAD = 'clippy-web/public/vid.mov'
 
     const payload = {
       post_info: {
@@ -55,7 +66,10 @@ export default function ClippyAIDashboard() {
         video_cover_timestamp_ms: 1000,
       },
       source_info: {
-        source: FILE_UPLOAD,
+        source: 'FILE_UPLOAD', // TikTok expects metadata first, not actual file yet
+        video_size: 12345678,
+        chunk_size: 5000000,
+        total_chunk_count: 3,
       },
     }
 
@@ -73,26 +87,19 @@ export default function ClippyAIDashboard() {
       )
 
       const data = await res.json()
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Failed to initiate upload')
-      }
-
-      console.log('Init Success:', data)
-
-      // Continue with chunk upload using data.upload_id
+      if (!res.ok) throw new Error(data.message || 'Failed to initiate upload')
+      console.log('✅ Init Success:', data)
     } catch (err) {
-      console.error('Init error:', err)
+      console.error('❌ Init error:', err)
     }
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <button className="text-black " onClick={getAccessToken}>
-        {' '}
+      <button className="text-black" onClick={getAccessToken}>
         Get Access Token
       </button>
+
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -104,7 +111,6 @@ export default function ClippyAIDashboard() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Clips Grid */}
         <div className="mb-6">
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">
             Generated Clips
@@ -114,6 +120,7 @@ export default function ClippyAIDashboard() {
           </p>
         </div>
       </div>
+
       <button
         className="px-8 py-3 text-black hover:pointer flex items-center justify-center border-2 border-solid border-black"
         onClick={submitVideo}
