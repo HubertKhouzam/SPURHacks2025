@@ -17,7 +17,7 @@ sock.send(f"JOIN {CHANNEL}\n".encode('utf-8'))
 print(f"Connected to {CHANNEL} as {NICK}")
 
 # Listen for messages
-while True:
+while 1:
     resp = sock.recv(2048).decode('utf-8')
 
     # Respond to PINGs to avoid being disconnected
@@ -27,6 +27,7 @@ while True:
 
     # Print chat messages
     if "PRIVMSG" in resp:
-        username = resp.split('!', 1)[0][1:]
-        message = resp.split('PRIVMSG', 1)[1].split(':', 1)[1]
-        print(f"{username}: {message.strip()}")
+        # username = resp.split('!', 1)[0][1:]
+        # message = resp.split('PRIVMSG', 1)[1].split(':', 1)[1]
+        # print(f"{username}: {message.strip()}")
+        print(resp)
