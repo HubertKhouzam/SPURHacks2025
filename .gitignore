@@ -1,0 +1,7 @@
+
+# Media server
+./server/media/*
+!/server/media/.gitkeep
+
+# Log files
+./server/*.log
