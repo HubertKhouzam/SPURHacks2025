@@ -23,6 +23,8 @@ npm install
 nohup node media-server.js > media.log 2>&1 &
 echo "🚀 Media server started on rtmp://localhost:1935/live/$STREAM_KEY"
 
+sleep 5
+
 # Check if --buffer flag was passed
 if [[ "$1" == "--buffer" ]]; then
   # Create media directory if it doesn't exist

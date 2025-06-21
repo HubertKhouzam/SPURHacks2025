@@ -4,4 +4,5 @@ package-lock.json
 
 
 # Media server
-media.log
+./server/media/*
+!/server/media/.gitkeep
