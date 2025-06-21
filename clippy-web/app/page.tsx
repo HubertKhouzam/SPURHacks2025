@@ -11,7 +11,7 @@ export default function ClippyAILanding() {
 
   const handleTikTokLogin = () => {
     const CLIENT_KEY = 'sbawf7caqj8uuzazw8'
-    const REDIRECT_URI = 'https://yourdomain.com/api/callback' // replace with your real endpoint
+    const REDIRECT_URI = 'https://spur-hacks2025.vercel.app/auth' // replace with your real endpoint
 
     const csrfState = Math.random().toString(36).substring(2) // optional for now
 
