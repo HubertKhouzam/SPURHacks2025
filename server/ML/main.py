@@ -1,0 +1,32 @@
+import socket
+
+# 🔧 Replace these with your details
+HOST = 'irc.chat.twitch.tv'
+PORT = 6667
+NICK = 'flaccdo'  # Your Twitch username
+TOKEN = 'oauth:5hat2rxorg0y8j0ti7gt13rdtztadj'  # From TwitchTokenGenerator
+CHANNEL = '#caedrel'  # The channel you want to monitor, e.g. #xqc
+
+# Set up socket connection to Twitch IRC
+sock = socket.socket()
+sock.connect((HOST, PORT))
+sock.send(f"PASS {TOKEN}\n".encode('utf-8'))
+sock.send(f"NICK {NICK}\n".encode('utf-8'))
+sock.send(f"JOIN {CHANNEL}\n".encode('utf-8'))
+
+print(f"Connected to {CHANNEL} as {NICK}")
+
+# Listen for messages
+while True:
+    resp = sock.recv(2048).decode('utf-8')
+
+    # Respond to PINGs to avoid being disconnected
+    if resp.startswith("PING"):
+        sock.send("PONG :tmi.twitch.tv\n".encode('utf-8'))
+        continue
+
+    # Print chat messages
+    if "PRIVMSG" in resp:
+        username = resp.split('!', 1)[0][1:]
+        message = resp.split('PRIVMSG', 1)[1].split(':', 1)[1]
+        print(f"{username}: {message.strip()}")
