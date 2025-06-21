@@ -1,8 +1,9 @@
 import socket
 from datetime import datetime
-
+from collections import deque
 
 def chatFunc():
+
   # 🔧 Replace these with your details
   HOST = 'irc.chat.twitch.tv'
   PORT = 6667
@@ -11,6 +12,13 @@ def chatFunc():
   CHANNEL = '#jasontheween'  # The channel you want to monitor, e.g. #xqc
 
   # Set up socket connection to Twitch IRC
+
+
+  WINDOW_SECONDS = 60
+  PEAK_MULTIPLIER = 2
+
+  message_times = deque()
+
   sock = socket.socket()
   sock.connect((HOST, PORT))
   sock.send(f"PASS {TOKEN}\n".encode('utf-8'))
@@ -23,18 +31,50 @@ def chatFunc():
   while 1:
       resp = sock.recv(2048).decode('utf-8')
 
-      for line in resp.strip().split('\r\n'):
-          if line.startswith("PING"):
-              sock.send("PONG :tmi.twitch.tv\n".encode('utf-8'))
-              continue
+      # Respond to PINGs to avoid being disconnected
+      if resp.startswith("PING"):
+          sock.send("PONG :tmi.twitch.tv\n".encode('utf-8'))
+          continue
 
-          if "PRIVMSG" in line:
-              try:
-                  message = line.split('PRIVMSG', 1)[1].split(':', 1)[1]
-                  timestamp = datetime.now().strftime("%H:%M:%S")
-                  print(f"[{timestamp}] {message.strip()}")
-              except IndexError:
-                  print(f"[WARN] Could not parse line: {line}")
+      # Print chat messages
+      if "PRIVMSG" in resp:
+          # username = resp.split('!', 1)[0][1:]
+          message = resp.split('PRIVMSG', 1)[1].split(':', 1)[1]
+          # print(f"{username}: {message.strip()}")
+          timestamp = datetime.now().strftime("%H:%M:%S")
+          message_times.append(timestamp)
+
+          # print(f"[{timestamp}] {message}")
+          # print(message_times)
+      
+
+
+      while len(message_times) >= 2 and (
+          (datetime.strptime(message_times[-1], "%H:%M:%S") - datetime.strptime(message_times[0], "%H:%M:%S")).total_seconds() > WINDOW_SECONDS
+      ):
+          message_times.popleft()
+
+
+      print(message_times)
+
+          # Convert timestamp strings to datetime objects for comparison
+          # now = datetime.strptime(timestamp, "%H:%M:%S")
+          # while message_times and (now - datetime.strptime(message_times[0], "%H:%M:%S")).total_seconds() > WINDOW_SECONDS:
+          #     message_times.popleft()
+
+
+          # if len(message_times) > 1:
+          #     duration = (datetime.strptime(message_times[-1], "%H:%M:%S") - datetime.strptime(message_times[0], "%H:%M:%S")).total_seconds()
+          #     avg_rate = len(message_times) / duration if duration > 0 else 0
+          #     current_rate = len(message_times) / WINDOW_SECONDS
+
+
+          #     if avg_rate > current_rate * PEAK_MULTIPLIER:
+          #         print(f"Peak detected! Avg rate: {avg_rate:.2f} msgs/s, Current rate: {current_rate:.2f} msgs/s")
+          
+
+
+
 
 
 if __name__ == '__main__':
