@@ -16,3 +16,4 @@ const config = {
 
 const nms = new NodeMediaServer(config);
 nms.run();
+console.log("RTMP server running on rtmp://localhost:1935/live");
