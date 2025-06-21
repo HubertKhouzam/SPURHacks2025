@@ -1,3 +1,7 @@
 # NodeJS
 node_modules
 package-lock.json
+
+
+# Media server
+media.log
