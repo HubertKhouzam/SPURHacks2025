@@ -1,4 +1,5 @@
 import socket
+from datetime import datetime
 
 # 🔧 Replace these with your details
 HOST = 'irc.chat.twitch.tv'
@@ -28,6 +29,7 @@ while 1:
     # Print chat messages
     if "PRIVMSG" in resp:
         # username = resp.split('!', 1)[0][1:]
-        # message = resp.split('PRIVMSG', 1)[1].split(':', 1)[1]
+        message = resp.split('PRIVMSG', 1)[1].split(':', 1)[1]
         # print(f"{username}: {message.strip()}")
-        print(resp)
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        print(f"[{timestamp}] {message}")
