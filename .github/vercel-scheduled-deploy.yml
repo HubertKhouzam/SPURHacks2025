@@ -1,4 +1,4 @@
-name: Weekly Vercel Deployment
+name: Hourly Vercel Deployment
 
 on:
   schedule:
