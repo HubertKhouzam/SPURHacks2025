@@ -21,15 +21,15 @@ print(f"Connected to {CHANNEL} as {NICK}")
 while 1:
     resp = sock.recv(2048).decode('utf-8')
 
-    # Respond to PINGs to avoid being disconnected
-    if resp.startswith("PING"):
-        sock.send("PONG :tmi.twitch.tv\n".encode('utf-8'))
-        continue
+    for line in resp.strip().split('\r\n'):
+        if line.startswith("PING"):
+            sock.send("PONG :tmi.twitch.tv\n".encode('utf-8'))
+            continue
 
-    # Print chat messages
-    if "PRIVMSG" in resp:
-        # username = resp.split('!', 1)[0][1:]
-        message = resp.split('PRIVMSG', 1)[1].split(':', 1)[1]
-        # print(f"{username}: {message.strip()}")
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        print(f"[{timestamp}] {message}")
+        if "PRIVMSG" in line:
+            try:
+                message = line.split('PRIVMSG', 1)[1].split(':', 1)[1]
+                timestamp = datetime.now().strftime("%H:%M:%S")
+                print(f"[{timestamp}] {message.strip()}")
+            except IndexError:
+                print(f"[WARN] Could not parse line: {line}")
