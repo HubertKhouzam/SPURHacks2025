@@ -1,3 +1,3 @@
 # SPURHacks2025
 
-V 0.01 - Auth
+V 0.0.2 - Auth
