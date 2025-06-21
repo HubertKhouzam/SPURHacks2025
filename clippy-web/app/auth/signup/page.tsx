@@ -111,7 +111,7 @@ export default function ClippyAISignup() {
     setError('')
 
     try {
-      const userCredential = await handleUserSignUp(
+      let userCredential = await handleUserSignUp(
         formData.email,
         formData.password
       )
@@ -124,8 +124,19 @@ export default function ClippyAISignup() {
       })
 
       if (userCredential) {
-        router.push('/account')
+        try {
+          await updateCurrentUser(getAuth(), {
+            ...userCredential.user,
+            displayName: `${formData.firstName} ${formData.lastName}`,
+          })
+        } catch (error) {
+          console.log(error)
+        }
+      } else {
+        console.error('No user signup')
       }
+
+      router.push('/account')
     } catch (err) {
       console.error('Signup error:', err)
     } finally {

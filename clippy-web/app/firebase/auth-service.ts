@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   updateCurrentUser,
   UserCredential,
+  getAuth,
 } from 'firebase/auth'
 
 import { firebaseAuth } from './config'
@@ -17,6 +18,7 @@ export async function handleUserSignUp(
       email,
       password
     )
+
     return userCredentials
   } catch (error: any) {
     console.log(error)
