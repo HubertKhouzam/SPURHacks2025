@@ -1,0 +1,9 @@
+[6/21/2025, 6:01:22 PM] [INFO] Node-Media-Server v4.0.18
+[6/21/2025, 6:01:22 PM] [INFO] Homepage: https://github.com/illuspas/Node-Media-Server
+[6/21/2025, 6:01:22 PM] [INFO] License: Apache-2.0
+[6/21/2025, 6:01:22 PM] [INFO] Author: Chen Mingliang
+RTMP server running on rtmp://localhost:1935/live
+[6/21/2025, 6:01:22 PM] [INFO] HTTP server listening on port undefined:8000
+[6/21/2025, 6:01:22 PM] [INFO] Rtmp Server listening on port undefined:1935
+[6/21/2025, 6:03:45 PM] [INFO] RTMP session mc6js86c06lcn7u1 ::ffff:192.159.180.156:57812 start push /live/ok
+[6/21/2025, 6:09:44 PM] [INFO] RTMP session mc6jzx4baunbq7j1 ::ffff:192.159.180.156:55375 start play /live/ok
