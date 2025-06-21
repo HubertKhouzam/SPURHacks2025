@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { handleUserLogIn } from '@/app/firebase/auth-service'
+import { handleUserLogIn } from '@/firebase/auth-service'
 
 export default function ClippyAILogin() {
   const [isVisible, setIsVisible] = useState(false)

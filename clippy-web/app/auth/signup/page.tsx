@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { handleUserSignUp } from '@/app/firebase/auth-service'
+import { handleUserSignUp } from '@/firebase/auth-service'
 import { getAuth, updateCurrentUser } from 'firebase/auth'
 
 export default function ClippyAISignup() {
