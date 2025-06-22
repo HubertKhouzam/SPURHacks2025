@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
             video_cover_timestamp_ms: 1000,
           },
           source_info: {
-            source: 'public/vid.mov', // Use the source from request
+            source: 'FILE_UPLOAD',
           },
         }),
       }

@@ -14,7 +14,10 @@ export default function TikTokLoginPreview() {
 
     const url = new URL('https://www.tiktok.com/v2/auth/authorize/')
     url.searchParams.set('client_key', 'sbawf7caqj8uuzazw8')
-    url.searchParams.set('scope', 'user.info.basic')
+    url.searchParams.set(
+      'scope',
+      'user.info.basic, video.publish, video.upload'
+    )
     url.searchParams.set('response_type', 'code')
     url.searchParams.set('redirect_uri', REDIRECT_URI)
     window.location.href = url.toString() // ✅ actually navigates to TikTok
