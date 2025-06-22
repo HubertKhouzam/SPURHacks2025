@@ -186,9 +186,9 @@ export default function ClippyAISignup() {
         </button>
 
         <div className="text-2xl font-black text-gray-900">
-          Clippy
+          Clip
           <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            AI
+            Daddy
           </span>
         </div>
       </div>

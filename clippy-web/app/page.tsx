@@ -49,9 +49,9 @@ export default function TikTokLoginPreview() {
             className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
           >
             <h1 className="text-6xl md:text-7xl font-black text-gray-900 mb-6">
-              Clippy
+              Clip
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                AI
+                Daddy
               </span>
             </h1>
           </div>

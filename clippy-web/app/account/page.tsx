@@ -536,9 +536,9 @@ export default function ClippyAIAccount() {
         {/* Logo */}
         <div className="p-6 border-b border-gray-800">
           <div className="text-2xl font-black">
-            Clippy
+            Clip
             <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              AI
+              Daddy
             </span>
           </div>
         </div>
