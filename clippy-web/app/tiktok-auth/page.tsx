@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 export default function ClippyAIDashboard() {
   const [code, setCode] = useState<string | null>(null)
-  const [tokenResponse, setTokenResponse] = useState<any>(null)
+  const [token, setToken] = useState<any>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -53,7 +53,7 @@ export default function ClippyAIDashboard() {
 
       const data = await response.json()
       console.log('✅ Access Token Response:', data)
-      setTokenResponse(data)
+      setToken(data.access_token)
       return data
     } catch (err) {
       console.error('❌ Error fetching access token:', err)
@@ -61,7 +61,32 @@ export default function ClippyAIDashboard() {
     }
   }
 
-  const submitVideo = () => {}
+  const submitVideo = async () => {
+    const accessToken = token
+    console.log('my access token is ', accessToken)
+    try {
+      const response = await fetch(
+        'https://open.tiktokapis.com/v2/post/publish/inbox/video/init/',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            source_info: {
+              source: 'public/vid.mov',
+            },
+          }),
+        }
+      )
+
+      const data = await response.json()
+      console.log('✅ TikTok Init Upload Response:', data)
+    } catch (err) {
+      console.error('❌ Failed to init upload:', err)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -87,7 +112,7 @@ export default function ClippyAIDashboard() {
       </div>
 
       <button
-        className="px-8 py-3 text-black hover:pointer flex items-center justify-center border-2 border-solid border-black"
+        className="px-8 py-3 text-black hover:cursor-pointer flex items-center justify-center border-2 border-solid border-black"
         onClick={submitVideo}
       >
         Publish Clip
