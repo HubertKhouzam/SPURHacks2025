@@ -76,10 +76,9 @@ export default function ClippyAIDashboard() {
           video_cover_timestamp_ms: 1000,
         },
         source_info: {
-          source: 'FILE_UPLOAD',
-          video_size: 50000123, // Replace with actual size
-          chunk_size: 10000000, // Match what you’ll use for chunking
-          total_chunk_count: 5, // Match your total chunks
+          source: 'PULL_FROM_URL',
+          video_url:
+            'https://spurhacks25.s3.us-east-2.amazonaws.com/videoplayback.mp4',
         },
       }),
     })
