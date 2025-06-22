@@ -87,34 +87,40 @@ export default function ClippyAIDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow-md border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-gray-900">
               Clippy<span className="text-purple-600">AI</span>
             </h1>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Title Section */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Generated Clips
           </h2>
-          <p className="text-gray-600">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Review and manage your AI-generated short form clips
           </p>
         </div>
-      </div>
 
-      <button
-        className="px-8 py-3 text-black hover:cursor-pointer flex items-center justify-center border-2 border-solid border-black"
-        onClick={submitVideo}
-      >
-        Publish Clip
-      </button>
+        {/* Publish Button */}
+        <div className="text-center">
+          <button
+            className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-12 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 hover:from-purple-700 hover:to-blue-700"
+            onClick={submitVideo}
+          >
+            🚀 Publish Clip
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
