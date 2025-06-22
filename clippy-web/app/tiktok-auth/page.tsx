@@ -69,7 +69,7 @@ export default function ClippyAIDashboard() {
         access_token: token, // Your TikTok OAuth access token
         post_info: {
           title: 'this will be a funny #cat video on your @tiktok #fyp',
-          privacy_level: 'MUTUAL_FOLLOW_FRIENDS',
+          privacy_level: 'SELF_ONLY',
           disable_duet: false,
           disable_comment: true,
           disable_stitch: false,
