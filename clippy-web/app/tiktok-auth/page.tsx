@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 export default function ClippyAIDashboard() {
   const [code, setCode] = useState<string | null>(null)
   const [token, setToken] = useState<any>(null)
+  const [videoUrl] = useState('https://clipdaddy.co/video.mp4')
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -109,6 +110,28 @@ export default function ClippyAIDashboard() {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Review and manage your AI-generated short form clips
           </p>
+        </div>
+
+        <div className="flex justify-center mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 max-w-md">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+              Preview
+            </h3>
+            <div className="relative">
+              <video
+                src={videoUrl}
+                controls
+                className="w-full rounded-lg shadow-md"
+                style={{ maxHeight: '400px' }}
+                preload="metadata"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <p className="text-sm text-gray-500 mt-2 text-center">
+              Ready to publish to TikTok
+            </p>
+          </div>
         </div>
 
         {/* Publish Button */}
