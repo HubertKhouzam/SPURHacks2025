@@ -66,14 +66,26 @@ export default function ClippyAIDashboard() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        access_token: token, // Pass your local token
+        access_token: token, // Your TikTok OAuth access token
+        post_info: {
+          title: 'this will be a funny #cat video on your @tiktok #fyp',
+          privacy_level: 'MUTUAL_FOLLOW_FRIENDS',
+          disable_duet: false,
+          disable_comment: true,
+          disable_stitch: false,
+          video_cover_timestamp_ms: 1000,
+        },
         source_info: {
           source: 'FILE_UPLOAD',
+          video_size: 50000123, // Replace with actual size
+          chunk_size: 10000000, // Match what you’ll use for chunking
+          total_chunk_count: 5, // Match your total chunks
         },
       }),
     })
+
     const data = await response.json()
-    console.log(data)
+    console.log('🎥 TikTok Init Response:', data)
   }
 
   return (
