@@ -77,8 +77,7 @@ export default function ClippyAIDashboard() {
         },
         source_info: {
           source: 'PULL_FROM_URL',
-          video_url:
-            'http://clipdaddy.co.s3-website.us-east-2.amazonaws.com/videoplayback.mp4',
+          video_url: 'http://clipdaddy.co/videoplayback.mp4',
         },
       }),
     })
