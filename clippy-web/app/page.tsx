@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react'
 export default function TikTokLoginPreview() {
   const [isVisible, setIsVisible] = useState(false)
 
+  useEffect(() => {
+    setIsVisible(true)
+  }, [])
+
   const handleTikTokLogin = () => {
     const CLIENT_KEY = 'sbawf7caqj8uuzazw8'
     const REDIRECT_URI = 'https://spur-hacks2025.vercel.app/tiktok-auth/'
