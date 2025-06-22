@@ -1,13 +1,18 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function TikTokLoginPreview() {
   const [isVisible, setIsVisible] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     setIsVisible(true)
   }, [])
 
+  const handleAdminLogin = () => {
+    router.push('/auth/login')
+  }
   const handleTikTokLogin = () => {
     const CLIENT_KEY = 'sbawf7caqj8uuzazw8'
     const REDIRECT_URI = 'https://spur-hacks2025.vercel.app/tiktok-auth/'
@@ -97,6 +102,18 @@ export default function TikTokLoginPreview() {
                          hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-gray-300"
             >
               <span className="relative z-10">Log into TikTok</span>
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full opacity-0 
+                              group-hover:opacity-100 transition-opacity duration-300 blur-sm"
+              ></div>
+            </button>
+            <button
+              onClick={handleAdminLogin}
+              className="group relative px-12 py-4 ml-6 bg-black text-white font-semibold text-lg rounded-full 
+                         hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 
+                         hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-gray-300"
+            >
+              <span className="relative z-10">Admin Dashboard</span>
               <div
                 className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full opacity-0 
                               group-hover:opacity-100 transition-opacity duration-300 blur-sm"
