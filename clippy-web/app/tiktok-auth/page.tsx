@@ -67,7 +67,9 @@ export default function ClippyAIDashboard() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         access_token: token, // Pass your local token
-        source_info: { source: 'public/vid.mov' },
+        source_info: {
+          source: 'FILE_UPLOAD',
+        },
       }),
     })
     const data = await response.json()
