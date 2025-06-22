@@ -61,11 +61,37 @@ export default function ClippyAIDashboard() {
     }
   }
 
+  const submitVideo = () => {}
+
   return (
-    <div>
-      <h1>Clippy AI Dashboard</h1>
-      <p>Authorization Code: {code}</p>
-      <pre>Access Token Response: {JSON.stringify(tokenResponse, null, 2)}</pre>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Clippy<span className="text-purple-600">AI</span>
+            </h1>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            Generated Clips
+          </h2>
+          <p className="text-gray-600">
+            Review and manage your AI-generated short form clips
+          </p>
+        </div>
+      </div>
+
+      <button
+        className="px-8 py-3 text-black hover:pointer flex items-center justify-center border-2 border-solid border-black"
+        onClick={submitVideo}
+      >
+        Publish Clip
+      </button>
     </div>
   )
 }
