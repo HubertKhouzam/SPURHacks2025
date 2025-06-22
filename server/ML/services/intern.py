@@ -2,12 +2,14 @@ from openai import OpenAI
 import base64
 import cv2
 import time
+import logging
 from datetime import datetime, timedelta
 
 def process_video(video_path: str, event_q=None):
+    logger = logging.getLogger('intern')
     client = OpenAI(
-        api_key="eyJ0eXBlIjoiSldUIiwiYWxnIjoiSFM1MTIifQ.eyJqdGkiOiI4MjYwMzExMSIsInJvbCI6IlJPTEVfUkVHSVNURVIiLCJpc3MiOiJPcGVuWExhYiIsImlhdCI6MTc1MDU0NDU2OCwiY2xpZW50SWQiOiJlYm1ydm9kNnlvMG5semFlazF5cCIsInBob25lIjoiIiwib3BlbklkIjpudWxsLCJ1dWlkIjoiMWZmZjRhZmUtYTVjZS00ODQ4LWE5OWItY2RhZTIyYmYwNDMwIiwiZW1haWwiOiIiLCJleHAiOjE3NjYwOTY1Njh9.FQ5ifmAytwX1yGaZuUI8So-1qUMNaXC82Yi3_fun4r6dQB8BfpZ7v4Dj1wha9q8Dw5_R9-CBSrCu4sKYfC3gog",
         base_url="https://chat.intern-ai.org.cn/api/v1/",
+        api_key="eyJ0eXBlIjoiSldUIiwiYWxnIjoiSFM1MTIifQ.eyJqdGkiOiI4MjYwMzExMSIsInJvbCI6IlJPTEVfUkVHSVNURVIiLCJpc3MiOiJPcGVuWExhYiIsImlhdCI6MTc1MDU0NDU2OCwiY2xpZW50SWQiOiJlYm1ydm9kNnlvMG5semFlazF5cCIsInBob25lIjoiIiwib3BlbklkIjpudWxsLCJ1dWlkIjoiMWZmZjRhZmUtYTVjZS00ODQ4LWE5OWItY2RhZTIyYmYwNDMwIiwiZW1haWwiOiIiLCJleHAiOjE3NjYwOTY1Njh9.Y3LDmxXwPTDctag9sjrq281gxdTDoyfaLZVbFnXSi72mKmPQ4b5VfFDMD48RuDhkFsYRFyMR5PgQCDE7EuANvA"
     )
 
     cap = cv2.VideoCapture(video_path)
@@ -50,11 +52,11 @@ def process_video(video_path: str, event_q=None):
                         "frame": current_second
                     })
                 else:
-                    print(f"\nTimestamp: {timestamp}")
-                    print(f"Frame {current_second}: {description}")
+                    logger.info(f"Timestamp: {timestamp}")
+                    logger.info(f"Frame {current_second}: {description}")
                 
             except Exception as e:
-                print(f"Error processing frame at {timestamp}: {str(e)}")
+                logger.error(f"Error processing frame at {timestamp}: {str(e)}")
             
             # Add a small delay to avoid rate limiting
             time.sleep(0.5)
@@ -64,5 +66,10 @@ def process_video(video_path: str, event_q=None):
     cap.release()
 
 if __name__ == "__main__":
+    # Set up basic logging for standalone usage
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     video_path = "videos/IMG_2227.mp4" 
     process_video(video_path)

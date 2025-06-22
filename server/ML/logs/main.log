@@ -1,0 +1,5 @@
+2025-06-22 09:41:43,767 - main - INFO - Monitoring directory: ../media
+2025-06-22 09:41:43,767 - main - INFO - Found new clip: out04.mp4
+2025-06-22 09:41:43,767 - main - INFO - Waiting for file stability: out04.mp4
+2025-06-22 09:41:49,862 - main - INFO - File ../media/out04.mp4 is stable and ready (took 6.1s)
+2025-06-22 09:41:49,862 - main - INFO - File stable, waiting 3 more seconds before processing: out04.mp4

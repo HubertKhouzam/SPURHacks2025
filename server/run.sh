@@ -23,19 +23,20 @@ npm install
 nohup node media-server.js > media.log 2>&1 &
 echo "🚀 Media server started on rtmp://localhost:1935/live/$STREAM_KEY"
 
-sleep 5
+sleep 10
 
 # Check if --buffer flag was passed
 if [[ "$1" == "--buffer" ]]; then
   # Create media directory if it doesn't exist
   mkdir -p media
 
-  # Start FFmpeg rolling buffer into ./media
+  # Start FFmpeg segment recording with timestamps
   nohup ffmpeg -i "$STREAM_URL" \
-    -c copy -f segment -segment_time 6 -segment_wrap 10 \
-    -reset_timestamps 1 media/out%02d.mp4 > ffmpeg.log 2>&1 &
+    -c copy -f segment -segment_time 6 \
+    -reset_timestamps 1 -strftime 1 \
+    media/clip_%Y%m%d_%H%M%S.mp4 > ffmpeg.log 2>&1 &
 
-  echo "🎥 Rolling buffer is running and saving to ./media/"
+  echo "🎥 Recording segments to ./media/ with timestamp names"
 else
   echo "ℹ️ Buffer not started. Run './run.sh --buffer' to enable rolling buffer."
 fi

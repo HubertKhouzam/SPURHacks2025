@@ -1,9 +1,11 @@
 import whisper
 import os
+import logging
 from datetime import datetime
 
 
 def transcribe_video(video_path, event_q=None):
+    logger = logging.getLogger('transcript')
     model = whisper.load_model("base")
     result = model.transcribe(video_path)
     
@@ -21,14 +23,19 @@ def transcribe_video(video_path, event_q=None):
                     "video_timestamp": timestamp
                 })
             else:
-                print(f"\nTimestamp: {timestamp}s")
-                print(f"Transcript: {text}")
+                logger.info(f"Timestamp: {timestamp}s")
+                logger.info(f"Transcript: {text}")
     
     return result["text"]
 
 
 if __name__ == "__main__":
+    # Set up basic logging for standalone usage
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     video_path = "videos/IMG_2227.mp4"  # Change this to your video file path
     transcript = transcribe_video(video_path)
-    print(transcript)
+    logging.getLogger('transcript').info(transcript)
 
