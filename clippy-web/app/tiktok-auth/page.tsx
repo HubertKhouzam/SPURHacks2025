@@ -24,8 +24,8 @@ export default function ClippyAIDashboard() {
 
     try {
       const body = new URLSearchParams({
-        client_key: 'sbawf7caqj8uuzazw8',
-        client_secret: 'MvMm4uH37w0QKO8gQjs5mQHn8MsXBrX1',
+        client_key: CLIENT_KEY,
+        client_secret: CLIENT_SECRET,
         code: authCode,
         grant_type: 'authorization_code',
         redirect_uri: REDIRECT_URI,
