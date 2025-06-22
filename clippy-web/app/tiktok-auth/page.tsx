@@ -62,30 +62,15 @@ export default function ClippyAIDashboard() {
   }
 
   const submitVideo = async () => {
-    const accessToken = token
-    console.log('my access token is ', accessToken)
-    try {
-      const response = await fetch(
-        'https://open.tiktokapis.com/v2/post/publish/inbox/video/init/',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            source_info: {
-              source: 'public/vid.mov',
-            },
-          }),
-        }
-      )
-
-      const data = await response.json()
-      console.log('✅ TikTok Init Upload Response:', data)
-    } catch (err) {
-      console.error('❌ Failed to init upload:', err)
-    }
+    const response = await fetch('/api/tiktok-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        source_info: { source: 'public/vid.mov' },
+      }),
+    })
+    const data = await response.json()
+    console.log(data)
   }
 
   return (
