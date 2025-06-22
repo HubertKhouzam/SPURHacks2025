@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 export default function ClippyAIDashboard() {
   const [code, setCode] = useState<string | null>(null)
   const [token, setToken] = useState<any>(null)
+  const [videoUrl] = useState('https://clipdaddy.co/video.mp4')
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -77,8 +78,7 @@ export default function ClippyAIDashboard() {
         },
         source_info: {
           source: 'PULL_FROM_URL',
-          video_url:
-            'https://spurhacks25.s3.us-east-2.amazonaws.com/videoplayback.mp4',
+          video_url: 'https://clipdaddy.co/video.mp4',
         },
       }),
     })
@@ -88,34 +88,62 @@ export default function ClippyAIDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow-md border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Clippy<span className="text-purple-600">AI</span>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Clip<span className="text-purple-600">Daddy</span>
             </h1>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Title Section */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Generated Clips
           </h2>
-          <p className="text-gray-600">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Review and manage your AI-generated short form clips
           </p>
         </div>
-      </div>
 
-      <button
-        className="px-8 py-3 text-black hover:cursor-pointer flex items-center justify-center border-2 border-solid border-black"
-        onClick={submitVideo}
-      >
-        Publish Clip
-      </button>
+        <div className="flex justify-center mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 max-w-md">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+              Preview
+            </h3>
+            <div className="relative">
+              <video
+                src={videoUrl}
+                controls
+                className="w-full rounded-lg shadow-md"
+                style={{ maxHeight: '400px' }}
+                preload="metadata"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <p className="text-sm text-gray-500 mt-2 text-center">
+              Ready to publish to TikTok
+            </p>
+          </div>
+        </div>
+
+        {/* Publish Button */}
+        <div className="text-center">
+          <button
+            className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-12 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 hover:from-purple-700 hover:to-blue-700"
+            onClick={submitVideo}
+          >
+            🚀 Publish Clip
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

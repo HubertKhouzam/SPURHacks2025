@@ -21,9 +21,11 @@ export default function ClippyAILogin() {
     setError('')
 
     try {
-      const user = handleUserLogIn(email, password)
+      const user = await handleUserLogIn(email, password)
 
-      router.push('/account')
+      if (user) {
+        router.push('/account')
+      }
     } catch (err) {
       setError('Invalid email or password. Please try again.')
       console.error('Login error:', err)
@@ -74,9 +76,9 @@ export default function ClippyAILogin() {
         </button>
 
         <div className="text-2xl font-black text-gray-900">
-          Clippy
+          Clip
           <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            AI
+            Daddy
           </span>
         </div>
       </div>
@@ -158,7 +160,7 @@ export default function ClippyAILogin() {
                 </div>
 
                 <button
-                  onClick={() => handleLogin}
+                  onClick={() => handleLogin()}
                   disabled={isLoading}
                   className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold 
                            rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105
