@@ -1,9 +1,9 @@
 """
 main.py
-Run with:  python main.py --video output2.mp4
+Run with:  python main.py --clips_dir clips/
 
 Requires:
-  pip install deepface opencv-python pyenv-installed Python 3.9+
+  pip install deepface opencv-python openai-whisper pyenv-installed Python 3.9+
 """
 import argparse
 import queue
@@ -12,9 +12,15 @@ import time
 from datetime import datetime, timedelta
 import socket
 from collections import deque, Counter
+import os
+import glob
 
 from deepface import DeepFace
 import cv2
+from services.intern import process_video
+from services.transcript import transcribe_video
+from services.clip_processor import ClipProcessor
+
 
 
 ###############################################################################
@@ -23,33 +29,43 @@ import cv2
 def emotion_worker(video_path: str, event_q: queue.Queue, sample_every=10):
     cap = cv2.VideoCapture(video_path if video_path else 0)  # 0 == webcam
     frame_idx = 0
-    print("[Emotion] Worker started")
+    fps = int(cap.get(cv2.CAP_PROP_FPS))
+    print(f"[Emotion] Worker started - FPS: {fps}")
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+    try:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-        if frame_idx % sample_every == 0:
-            try:
-                res = DeepFace.analyze(
-                    frame,
-                    actions=["emotion"],
-                    enforce_detection=False,
-                )
-                dominant = res[0]["dominant_emotion"]
-                if dominant.lower() != "neutral":
-                    event_q.put(
-                        {
-                            "type": "emotion",
-                            "timestamp": datetime.now(),
-                            "emotion": dominant,
-                        }
+            if frame_idx % sample_every == 0:
+                try:
+                    res = DeepFace.analyze(
+                        frame,
+                        actions=["emotion"],
+                        enforce_detection=False,
                     )
-            except Exception:
-                pass  # ignore frames with no face / bad detection
+                    dominant = res[0]["dominant_emotion"]
+                    video_time = frame_idx / fps  # Calculate timestamp in video
+                    if dominant.lower() != "neutral":
+                        event_q.put(
+                            {
+                                "type": "emotion",
+                                "timestamp": datetime.now(),
+                                "video_time": video_time,
+                                "emotion": dominant,
+                            }
+                        )
+                except Exception as e:
+                    print(f"[Emotion] Frame {frame_idx} analysis error: {str(e)}")
+                    pass
 
-        frame_idx += 1
+            frame_idx += 1
+            
+    except Exception as e:
+        print(f"[Emotion] Worker error: {str(e)}")
+    finally:
+        cap.release()
 
     cap.release()
     print("[Emotion] Worker finished")
@@ -58,7 +74,7 @@ def emotion_worker(video_path: str, event_q: queue.Queue, sample_every=10):
 ###############################################################################
 # -----------------------------  Chat Worker  ---------------------------------
 ###############################################################################
-def chat_worker(event_q: queue.Queue):
+def chat_worker(event_q: queue.Queue, hype_detected: threading.Event = None):
     # Twitch IRC connection info
     HOST, PORT = "irc.chat.twitch.tv", 6667
     NICK = "flaccdo"
@@ -115,6 +131,8 @@ def chat_worker(event_q: queue.Queue):
                     last_peak_time = now
                     clip_start = now - timedelta(seconds=PRE_ROLL)
                     print(f"[Chat] 🔥 HYPE start {clip_start.strftime('%H:%M:%S')}")
+                    if hype_detected:
+                        hype_detected.set()  # Signal that hype was detected
 
                 elif in_peak:
                     if rate < baseline_rate * 1.1:
@@ -134,39 +152,140 @@ def chat_worker(event_q: queue.Queue):
 
 
 ###############################################################################
+# -----------------------------  Intern Worker  ---------------------------------
+###############################################################################
+def intern_worker(video_path: str, event_q: queue.Queue):
+    print("[Intern] Worker started")
+    try:
+        process_video(video_path)
+    except Exception as e:
+        print(f"[Intern] Error: {str(e)}")
+    finally:
+        print("[Intern] Worker finished")
+
+###############################################################################
+# -----------------------------  Transcript Worker  -----------------------------
+###############################################################################
+def transcript_worker(video_path: str, event_q: queue.Queue):
+    print("[Transcript] Worker started")
+    try:
+        transcribe_video(video_path, event_q)
+    except Exception as e:
+        print(f"[Transcript] Error: {str(e)}")
+    finally:
+        print("[Transcript] Worker finished")
+
+###############################################################################
 # -----------------------------  Main Runner  ---------------------------------
 ###############################################################################
-def run(video_path: str):
+def process_single_clip(clip_path: str, processor: ClipProcessor, clip_id: str):
+    """Process a single clip and collect its events. Analyze emotions to determine virality."""
     events = queue.Queue()
+    print(f"[Main] Processing clip: {clip_path}")
+    
+    # Start all workers in parallel
+    workers = [
+        threading.Thread(target=emotion_worker, args=(clip_path, events), daemon=True),
+        threading.Thread(target=intern_worker, args=(clip_path, events), daemon=True),
+        threading.Thread(target=transcript_worker, args=(clip_path, events), daemon=True),
+        threading.Thread(target=chat_worker, args=(events,), daemon=True)
+    ]
+    
+    for worker in workers:
+        worker.start()
+    
+    try:
+        # Process events with timeout
+        start_time = time.time()
+        while any(t.is_alive() for t in workers):
+            if time.time() - start_time > 6.0:  # Match clip length (6 seconds)
+                print(f"[Main] Finished processing clip: {clip_path}")
+                break
+            try:
+                evt = events.get(timeout=0.1)  # Shorter timeout for faster processing
+                processor.add_event(clip_id, evt)
+                
+                # Print event
+                if evt["type"] == "emotion":
+                    ts = evt["timestamp"].strftime("%H:%M:%S")
+                    print(f"[Event] 😃 Emotion: '{evt['emotion']}' at {ts}")
+                elif evt["type"] == "scene":
+                    ts = evt["timestamp"].strftime("%H:%M:%S")
+                    print(f"[Event] 🎥 Frame {evt['frame']}: {evt['description']}")
+                elif evt["type"] == "transcript":
+                    print(f"[Event] 💬 {evt['video_timestamp']}s: {evt['text']}")
+            except queue.Empty:
+                continue
+                
+    except KeyboardInterrupt:
+        print("\n[Main] Shutting down...")
+    
+    # Get dominant emotion and determine if viral
+    dominant_emotion, count = processor.get_dominant_emotion(clip_id)
+    if dominant_emotion == "neutral":
+        print(f"[Main] 😐 Clip {clip_id} is mostly neutral, skipping...")
+        return False
+        
+    print(f"[Main] 🎭 Dominant emotion in {clip_id}: {dominant_emotion}")
+    is_viral = processor.check_viral_status(clip_id)
+    return is_viral
 
-    # spawn workers
-    t1 = threading.Thread(
-        target=emotion_worker, args=(video_path, events), daemon=True
-    )
-    t2 = threading.Thread(target=chat_worker, args=(events,), daemon=True)
-    t1.start()
-    t2.start()
-
-    # central event pump
-    print("[Main] Listening for hype & emotions (Ctrl-C to quit)…")
+def run(clips_dir: str):
+    processor = ClipProcessor()
+    processed_files = set()
+    initial_hype_ignored = False
+    
+    print(f"[Main] Monitoring directory: {clips_dir}")
+    
     try:
         while True:
-            evt = events.get()
-            if evt["type"] == "emotion":
-                ts = evt["timestamp"].strftime("%H:%M:%S")
-                print(f"[Event] 😃 Non-neutral emotion '{evt['emotion']}' at {ts}")
-            elif evt["type"] == "hype":
-                s, e = evt["start"].strftime("%H:%M:%S"), evt["end"].strftime("%H:%M:%S")
-                print(f"[Event] 🚀 Hype window {s} → {e}")
+            # Check for new clips
+            clips = sorted(glob.glob(os.path.join(clips_dir, "*.mp4")))  # Sort to process in order
+            new_clips = [c for c in clips if c not in processed_files]
+            
+            if not initial_hype_ignored and new_clips:
+                print("[Main] Ignoring initial hype moment...")
+                initial_hype_ignored = True
+                processed_files.add(new_clips[0])
+                new_clips = new_clips[1:]
+            
+            for clip_path in new_clips:
+                clip_id = os.path.basename(clip_path)
+                is_viral = process_single_clip(clip_path, processor, clip_id)
+                
+                is_viral, description, peak_time = processor.check_viral_status(clip_id)
+                if is_viral:
+                    full_path = os.path.abspath(clip_path)
+                    print(f"\n[Main] 🎯 Viral clip detected: {clip_id}")
+                    print(f"[Main] 🎬 Trigger: {description}")
+                    print(f"[Main] ⏱️ Peak moment: {peak_time:.1f}s")
+                    processor.current_clips.append((full_path, description, peak_time))
+                else:
+                    print(f"[Main] Regular clip: {clip_id}")
+                    # If we have viral clips and hit a non-viral one, concatenate
+                    if processor.current_clips:
+                        compilation_dir = os.path.join(os.path.dirname(clips_dir), "compilations")
+                        os.makedirs(compilation_dir, exist_ok=True)
+                        output_path = os.path.join(compilation_dir, f"viral_compilation_{int(time.time())}.mp4")
+                        result = processor.concatenate_clips(output_path)
+                        if result:
+                            print(f"[Main] 🎬 Created viral compilation: {output_path}")
+                        processor.current_clips = []  # Reset for next batch
+                        
+                processed_files.add(clip_path)
+            
+            # Sleep before checking for new files
+            time.sleep(1)
+            
     except KeyboardInterrupt:
-        print("\n[Main] Shutting down…")
-
+        print("\n[Main] Shutting down...")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Hype + Emotion listener")
+    parser = argparse.ArgumentParser(description="Viral Clip Detector")
     parser.add_argument(
-        "--video",
-        default="output2.mp4",
-        help="Path to video file (or leave empty for webcam)",
+        "--clips_dir",
+        default="clips",
+        help="Directory containing input clips",
     )
-    run(**vars(parser.parse_args()))
+    args = parser.parse_args()
+    run(args.clips_dir)
