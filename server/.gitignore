@@ -7,3 +7,6 @@ package-lock.json
 ./server/media/*
 !/server/media/.gitkeep
 ML/videos
+
+#Env vars
+.env

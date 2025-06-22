@@ -4,4 +4,4 @@
 !/server/media/.gitkeep
 
 # Log files
-./server/*.log
+server/*.log
