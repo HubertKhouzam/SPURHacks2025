@@ -6,3 +6,10 @@ package-lock.json
 # Media server
 ./server/media/*
 !/server/media/.gitkeep
+ML/videos
+
+
+
+# Media server
+./server/media/*
+!/server/media/.gitkeep
