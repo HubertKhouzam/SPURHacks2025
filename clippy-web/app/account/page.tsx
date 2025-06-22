@@ -7,11 +7,17 @@ export default function ClippyAIAccount() {
   const [userName, setUserName] = useState('John Doe')
   const [clipsReady, setClipsReady] = useState(12)
   const [isVisible, setIsVisible] = useState(false)
+  const [videos, setVideos] = useState<string[]>([])
 
   useEffect(() => {
     setIsVisible(true)
-    // Simulate fetching user data
-    // In real app, this would come from Firebase or your backend
+    const fetchVideos = async () => {
+      const res = await fetch('/api/clips')
+      const data = await res.json()
+      setVideos(data.videos)
+    }
+
+    fetchVideos()
   }, [])
 
   const navigationItems = [
@@ -300,44 +306,40 @@ export default function ClippyAIAccount() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((clip) => (
-                <div
-                  key={clip}
-                  className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden"
-                >
-                  <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <svg
-                      className="w-12 h-12 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-5.4-2.4L12 5.4l2.4 2.4-2.4 2.4L9 7.8z"
+              {videos.length === 0 ? (
+                <p className="text-gray-500 col-span-full">No clips found.</p>
+              ) : (
+                videos.map((url, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden"
+                  >
+                    <div className="aspect-video bg-black">
+                      <video
+                        src={url}
+                        controls
+                        className="w-full h-full object-cover"
                       />
-                    </svg>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      Epic Gaming Moment #{clip}
-                    </h3>
-                    <p className="text-sm text-gray-500 mb-3">
-                      Generated 2 hours ago
-                    </p>
-                    <div className="flex space-x-2">
-                      <button className="flex-1 px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors">
-                        Publish
-                      </button>
-                      <button className="px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                        Edit
-                      </button>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-gray-900 mb-2">
+                        Clip #{index + 1}
+                      </h3>
+                      <p className="text-sm text-gray-500 mb-3">
+                        Uploaded from S3
+                      </p>
+                      <div className="flex space-x-2">
+                        <button className="flex-1 px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors">
+                          Publish
+                        </button>
+                        <button className="px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
+                          Edit
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         )
