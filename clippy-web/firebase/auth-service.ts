@@ -27,12 +27,16 @@ export async function handleUserSignUp(
   return null
 }
 
-export function handleUserLogIn(email: string, password: string) {
-  signInWithEmailAndPassword(firebaseAuth, email, password)
-    .then((userCredential) => {
-      return userCredential.user
-    })
-    .catch((error) => {
-      throw error
-    })
+export async function handleUserLogIn(email: string, password: string) {
+  try {
+    const userCredentials = await signInWithEmailAndPassword(
+      firebaseAuth,
+      email,
+      password
+    )
+
+    return userCredentials
+  } catch (error: any) {
+    console.log(error)
+  }
 }
